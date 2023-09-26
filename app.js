@@ -1,5 +1,40 @@
 // Storage Controller
 
+const StorageCtrl = (function(){
+  // Public methods
+  return {
+    storeItem: function(item){
+      let items;
+      // Check if any items in local storage
+      if(localStorage.getItem('items') === null){
+        items = [];
+        // Push new item
+        items.push(item);
+        // Set local storage
+        localStorage.setItem('items', JSON.stringify(items));
+      } else {
+        // Get what is already in local sstorage
+        items = JSON.parse(localStorage.getItem('items'));
+
+        // Push new item
+        items.push(item);
+
+        // Reset local storage
+        localStorage.setItem('items', JSON.stringify(items));
+      }
+    },
+
+    getItemsFromStorage: function(){
+      let items;
+      if(localStorage.getItem('items') === null){
+        items = [];
+      } else {
+        items = JSON.parse(localStorage.getItem('items'));
+      }
+      return items;
+    }
+  }
+})();
 
 // Item Controller
 const ItemCtrl = (function(){
@@ -12,11 +47,12 @@ const ItemCtrl = (function(){
 
   // Data Structure / State
   const data = {
-    items: [
+   // items: [
       // {id: 0, name: 'Steak Dinner', calories: 1200},
       // {id: 1, name: 'Cookie', calories: 400},
       // {id: 2, name: 'Eggs', calories: 300}
-    ],
+   // ],
+   items: StorageCtrl.getItemsFromStorage(),
     currentItem: null,
     totalCalories: 0
   }
@@ -244,7 +280,7 @@ const UICtrl = (function(){
 
 
 // App Controller
-const App = (function(ItemCtrl, UICtrl){
+const App = (function(ItemCtrl, StorageCtrl,  UICtrl){
   // Load event listeners
   const loadEventListeners = function(){
     // Get UI selectors
@@ -294,6 +330,9 @@ const App = (function(ItemCtrl, UICtrl){
       const totalCalories = ItemCtrl.getTotalCalories();
       // Add total calories to UI
       UICtrl.showTotalCalories(totalCalories);
+
+      //Store in localStorage
+      StorageCtrl.storeItem(newItem);
 
       // Clear fields
       UICtrl.clearInput();
@@ -414,7 +453,7 @@ const App = (function(ItemCtrl, UICtrl){
     }
   }
   
-})(ItemCtrl, UICtrl);
+})(ItemCtrl, StorageCtrl,  UICtrl);
 
 // initialize App 
 App.init();
